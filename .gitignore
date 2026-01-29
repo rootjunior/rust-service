@@ -1,0 +1,27 @@
+# Компилированные файлы
+/target/
+**/*.rs.bk
+
+# Файлы среды IDE и редакторов
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Логи
+*.log
+/logs
+
+# Сборки Cargo
+Cargo.lock
+
+# Environment
+.env
+
+# Временные файлы
+*.tmp
+*.temp
+
+# OS специфичные
+.DS_Store
+Thumbs.db
