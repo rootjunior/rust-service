@@ -27,7 +27,7 @@ impl App {
         let some_shutdown = shutdown.clone();
         let cron_shutdown = shutdown.clone();
 
-        // ---------------- GAME LOOP (sync blocking func)
+        // ---------------- RUN GAME LOOP (sync blocking func)
         let game_loop_handle = spawn_blocking(move || {
             while !game_shutdown.is_cancelled() {
                 info!("🎮 Работает игровой цикл...");
@@ -36,7 +36,7 @@ impl App {
             info!("🛑 Game task stopped gracefully");
         });
 
-        // ---------------- ASYNC LOOP
+        // ---------------- RUN ASYNC LOOP
         let some_loop_handle = spawn(async move {
             while !some_shutdown.is_cancelled() {
                 info!("⚙ Async loop...");
@@ -45,14 +45,14 @@ impl App {
             info!("🛑 Async task stopped gracefully");
         });
 
-        // ---------------- CRON JOBS
+        // ---------------- RUN CRON JOBS
         let cron_handle = spawn(async move {
             if let Err(e) = ProjectCron::setup(cron_shutdown).await {
                 error!("Cron error: {:?}", e);
             }
         });
 
-        // ----------------HTTP SERVER
+        // ---------------- RUN HTTP SERVER
         let server_handle = spawn(async move {
             if let Err(e) =
                 ProjectHTTPServer::run(server_shutdown, &state).await
