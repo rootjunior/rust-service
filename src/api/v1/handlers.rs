@@ -18,7 +18,7 @@ pub async fn me(user: AuthenticatedUser) -> UserResponse {
 
 #[utoipa::path(
     get,
-    path = "/api/v1",
+    path = "/api/v1/hello",
     tag = "Hello",
     responses(
         (status = 200, description = "Приветственное сообщение")
