@@ -1,11 +1,11 @@
-use crate::handlers::__path_hello;
-use crate::handlers::__path_me;
-use crate::models::AuthResult;
-use crate::models::UserResponse;
+use crate::core::models::AuthResult;
+use crate::core::models::UserResponse;
+use api::v1::handlers::__path_hello;
+use api::v1::handlers::__path_me;
 
+use crate::api;
 use utoipa::OpenApi;
 
-/// Основная документация API
 #[derive(OpenApi)]
 #[openapi(
     info(

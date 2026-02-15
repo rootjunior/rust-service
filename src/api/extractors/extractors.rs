@@ -1,5 +1,5 @@
-use crate::configs::AppState;
-use crate::models::{AuthResult, AuthenticatedUser};
+use crate::core::models::{AuthResult, AuthenticatedUser};
+use crate::state::AppState;
 use axum::extract::{FromRef, FromRequestParts};
 use axum::http::StatusCode;
 use axum::http::request::Parts;

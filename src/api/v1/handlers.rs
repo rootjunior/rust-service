@@ -1,8 +1,8 @@
-use crate::models::{AuthenticatedUser, UserResponse};
+use crate::core::models::{AuthenticatedUser, UserResponse};
 
 #[utoipa::path(
     get,
-    path = "/v1/me",
+    path = "/api/v1/me",
     tag = "Users",
     security(
         ("bearer_auth" = [])
@@ -18,7 +18,7 @@ pub async fn me(user: AuthenticatedUser) -> UserResponse {
 
 #[utoipa::path(
     get,
-    path = "/v1",
+    path = "/api/v1",
     tag = "Hello",
     responses(
         (status = 200, description = "Приветственное сообщение")

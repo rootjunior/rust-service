@@ -1,5 +1,4 @@
-use reqwest::Error;
-use reqwest::get;
+use reqwest::{Error, get};
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
