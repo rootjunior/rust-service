@@ -16,13 +16,12 @@ impl ProjectHTTPServer {
         shutdown: CancellationToken,
         state: &Arc<AppState>,
     ) -> std::io::Result<()> {
-        let openapi = swagger::ApiDoc::openapi();
         let app = router()
             .with_state(state.clone())
-            .merge(
-                SwaggerUi::new("/docs")
-                    .url("/api-doc/openapi.json", openapi.clone()),
-            )
+            .merge(SwaggerUi::new("/docs").url(
+                "/api-doc/openapi.json",
+                swagger::ApiDoc::openapi().clone(),
+            ))
             .layer(
                 TraceLayer::new_for_http()
                     .make_span_with(DefaultMakeSpan::new().level(Level::INFO))
