@@ -1,6 +1,6 @@
+use crate::core::handlers::hello::HelloQuery;
 use crate::core::models::{AuthenticatedUser, UserResponse};
 use crate::core::results::hello::GetHelloResult;
-use crate::core::use_cases::hello::HelloQuery;
 use crate::state::AppState;
 use axum::extract::State;
 
@@ -29,11 +29,12 @@ pub async fn me(user: AuthenticatedUser) -> UserResponse {
     )
 )]
 pub async fn hello(State(state): State<AppState>) -> String {
-    let mediator = &state.mediator;
-    let result = mediator
+    state
+        .mediator
         .query::<HelloQuery, GetHelloResult>(HelloQuery {
             name: "My name".to_string(),
         })
-        .await;
-    result.unwrap().name
+        .await
+        .unwrap()
+        .name
 }

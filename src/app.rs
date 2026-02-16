@@ -1,9 +1,9 @@
 use crate::api::server::ProjectHTTPServer;
 use crate::configs::Config;
-use crate::core::results::hello::GetHelloResult;
-use crate::core::use_cases::hello::{
-    GetHelloUseCase, HelloQuery, HelloRepository,
+use crate::core::handlers::hello::{
+    GetHelloHandler, HelloQuery, HelloRepository,
 };
+use crate::core::results::hello::GetHelloResult;
 use crate::cron::ProjectCron;
 use crate::mediator::mediator::Mediator;
 use crate::state::AppState;
@@ -121,8 +121,8 @@ impl App {
     async fn setup_mediator(&self) -> Arc<Mediator> {
         let mediator = Arc::new(Mediator::new());
         mediator
-            .register_query::<HelloQuery, GetHelloResult, GetHelloUseCase>(
-                GetHelloUseCase::new(HelloRepository {}),
+            .register_query::<HelloQuery, GetHelloResult, GetHelloHandler>(
+                GetHelloHandler::new(HelloRepository {}),
             )
             .await;
         mediator

@@ -8,6 +8,15 @@ pub enum MediatorError {
     #[error("No query handler registered for type {0}")]
     QueryNotFound(String),
 
-    #[error("Query result type mismatch for type {0}")]
+    #[error("Handler type mismatch for {0}")]
+    HandlerTypeMismatch(String),
+
+    #[error("Command type mismatch for {0}")]
+    CommandTypeMismatch(String),
+
+    #[error("Query type mismatch for {0}")]
+    QueryTypeMismatch(String),
+
+    #[error("Query result type mismatch for {0}")]
     QueryResultMismatch(String),
 }
