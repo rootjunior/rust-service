@@ -20,7 +20,7 @@ impl ProjectHTTPServer {
         let app = router()
             .with_state(state.clone())
             .merge(
-                SwaggerUi::new("/swagger-ui")
+                SwaggerUi::new("/docs")
                     .url("/api-doc/openapi.json", openapi.clone()),
             )
             .layer(

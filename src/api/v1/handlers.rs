@@ -29,6 +29,7 @@ pub async fn me(user: AuthenticatedUser) -> UserResponse {
     )
 )]
 pub async fn hello(State(state): State<AppState>) -> String {
+    // Обрабатывать ошибки
     state
         .mediator
         .query::<HelloQuery, GetHelloResult>(HelloQuery {
