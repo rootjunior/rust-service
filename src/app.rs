@@ -7,6 +7,7 @@ use diesel_async::{AsyncMigrationHarness, AsyncPgConnection};
 use diesel_migrations::{
     EmbeddedMigrations, MigrationHarness, embed_migrations,
 };
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use tokio::task::spawn_blocking;
@@ -26,22 +27,16 @@ impl App {
     }
 
     pub async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let db_pool: Pool = bb8::Pool::builder()
-            .build(AsyncDieselConnectionManager::<AsyncPgConnection>::new(
-                &self.cfg.db_url,
-            ))
-            .await
-            .expect("Failed to create pool");
-
-        let state = AppState::setup(self.cfg.clone(), db_pool.clone()).await;
-
-        //  Применение  миграций
-        let mut harness =
-            AsyncMigrationHarness::new(db_pool.get_owned().await.expect("Occurred due to an error establishing a connection to the database"));
-        harness
-            .run_pending_migrations(MIGRATIONS)
-            .expect("An error occurred applying migrations");
-
+        let pool = self.setup_db_pool().await;
+        self.run_and_wait_tasks(
+            AppState::setup(self.cfg.clone(), pool.clone()).await,
+        )
+        .await
+    }
+    async fn run_and_wait_tasks(
+        &self,
+        state: Arc<AppState>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let shutdown = CancellationToken::new();
         let server_shutdown = shutdown.clone();
         let game_shutdown = shutdown.clone();
@@ -96,5 +91,24 @@ impl App {
         info!("✅ Application stopped cleanly");
 
         Ok(())
+    }
+    async fn setup_db_pool(&self) -> Pool {
+        let pool: Pool = bb8::Pool::builder()
+            .build(AsyncDieselConnectionManager::<AsyncPgConnection>::new(
+                &self.cfg.db_url,
+            ))
+            .await
+            .expect("Failed to create database connection pool");
+
+        //  Применение  миграций
+        let mut harness =
+            AsyncMigrationHarness::new(pool.get_owned().await.expect(
+                "Occurred due to an error establishing a connection to the database"
+            ));
+        harness
+            .run_pending_migrations(MIGRATIONS)
+            .expect("An error occurred applying migrations");
+
+        pool
     }
 }

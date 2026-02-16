@@ -7,9 +7,8 @@ pub struct Config {
     #[allow(dead_code)]
     pub secret_token: String,
     pub server_address: String,
-    #[allow(dead_code)]
-    _workers_count: usize,
-    _log_level: String,
+    pub workers_count: usize,
+    pub log_level: String,
     pub log_file_name_prefix: String,
     pub log_dir_path: String,
     pub db_url: String,
@@ -25,11 +24,11 @@ impl Config {
             var("HOST").expect("HOST must be set"),
             var("PORT").expect("PORT must be set")
         );
-        let _workers_count = var("WORKERS_COUNT")
+        let workers_count = var("WORKERS_COUNT")
             .expect("WORKERS_COUNT must be set")
             .parse()
             .expect("WORKERS_COUNT must be a number");
-        let _log_level = var("LOG_LEVEL").expect("LOG_LEVEL must be set");
+        let log_level = var("LOG_LEVEL").expect("LOG_LEVEL must be set");
         let log_file_name_prefix = var("LOG_FILE_NAME_PREFIX")
             .expect("LOG_FILE_NAME_PREFIX must be set");
         let log_dir_path =
@@ -38,21 +37,17 @@ impl Config {
         Self {
             secret_token,
             server_address,
-            _log_level,
-            _workers_count,
+            log_level,
+            workers_count,
             log_file_name_prefix,
             log_dir_path,
             db_url,
         }
     }
-    pub fn log_level(&self) -> LevelFilter {
-        self._log_level
+    pub fn get_log_level_filter(&self) -> LevelFilter {
+        self.log_level
             .parse::<Level>()
             .map(LevelFilter::from)
             .unwrap_or(LevelFilter::INFO)
-    }
-
-    pub fn workers_count(&self) -> usize {
-        self._workers_count
     }
 }

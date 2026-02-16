@@ -20,7 +20,7 @@ fn main() {
     let app = App::new(cfg.clone());
 
     let tokio_runtime = Builder::new_multi_thread()
-        .worker_threads(cfg.workers_count())
+        .worker_threads(cfg.workers_count)
         .enable_all()
         .build()
         .expect("Error building tokio runtime");
