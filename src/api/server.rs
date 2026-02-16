@@ -1,6 +1,10 @@
 use crate::api::router::router;
 use crate::api::swagger;
 use crate::state::AppState;
+use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
+use axum::routing::get;
+use axum::{response::IntoResponse, serve};
+use futures_util::StreamExt;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio_util::sync::CancellationToken;
@@ -17,6 +21,7 @@ impl ProjectHTTPServer {
         state: &Arc<AppState>,
     ) -> std::io::Result<()> {
         let app = router()
+            .route("/ws", get(ws_handler))
             .with_state(state.clone())
             .merge(SwaggerUi::new("/docs").url(
                 "/api-doc/openapi.json",
@@ -36,7 +41,7 @@ impl ProjectHTTPServer {
         );
         info!("Starting server on http://{}", &state.cfg.server_address);
 
-        axum::serve(listener, app)
+        serve(listener, app)
             .with_graceful_shutdown(async move {
                 tokio::signal::ctrl_c()
                     .await
@@ -48,5 +53,30 @@ impl ProjectHTTPServer {
             })
             .await?;
         Ok(())
+    }
+}
+
+async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
+    ws.on_upgrade(handle_socket)
+}
+
+async fn handle_socket(mut socket: WebSocket) {
+    println!("Client connected");
+
+    while let Some(Ok(msg)) = socket.next().await {
+        match msg {
+            Message::Text(text) => {
+                println!("Received: {}", text);
+                socket
+                    .send(Message::Text(format!("Echo: {}", text).into()))
+                    .await
+                    .unwrap();
+            }
+            Message::Close(_) => {
+                println!("Client disconnected");
+                return;
+            }
+            _ => {}
+        }
     }
 }
