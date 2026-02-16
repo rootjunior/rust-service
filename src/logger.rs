@@ -3,7 +3,7 @@ use tracing_appender::rolling;
 use tracing_subscriber::{fmt, prelude::*};
 
 #[derive(Clone)]
-pub struct Tracing {}
+pub struct Tracing;
 
 impl Tracing {
     pub async fn setup(cfg: &Config) -> std::io::Result<()> {

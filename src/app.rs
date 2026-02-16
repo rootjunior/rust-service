@@ -1,6 +1,11 @@
 use crate::api::server::ProjectHTTPServer;
 use crate::configs::Config;
+use crate::core::results::hello::GetHelloResult;
+use crate::core::use_cases::hello::{
+    GetHelloUseCase, HelloQuery, HelloRepository,
+};
 use crate::cron::ProjectCron;
+use crate::mediator::mediator::Mediator;
 use crate::state::AppState;
 use diesel_async::pooled_connection::{AsyncDieselConnectionManager, bb8};
 use diesel_async::{AsyncMigrationHarness, AsyncPgConnection};
@@ -14,6 +19,7 @@ use tokio::task::spawn_blocking;
 use tokio::{signal, spawn};
 use tokio_util::sync::CancellationToken;
 use tracing::{error, info};
+
 pub type Pool = bb8::Pool<AsyncPgConnection>;
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
@@ -27,11 +33,11 @@ impl App {
     }
 
     pub async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let pool = self.setup_db_pool().await;
-        self.run_and_wait_tasks(
-            AppState::setup(self.cfg.clone(), pool.clone()).await,
-        )
-        .await
+        // let pool = self.setup_db_pool().await;
+        let mediator = self.setup_mediator().await;
+        let state = AppState::setup(self.cfg.clone(), mediator).await;
+
+        self.run_and_wait_tasks(state).await
     }
     async fn run_and_wait_tasks(
         &self,
@@ -63,7 +69,7 @@ impl App {
 
         // ---------------- RUN CRON JOBS
         let cron_handle = spawn(async move {
-            if let Err(e) = ProjectCron::setup(cron_shutdown).await {
+            if let Err(e) = ProjectCron::start(cron_shutdown).await {
                 error!("Cron error: {:?}", e);
             }
         });
@@ -84,9 +90,9 @@ impl App {
 
         tokio::try_join!(
             server_handle,
-            game_loop_handle,
+            cron_handle,
             some_loop_handle,
-            cron_handle
+            game_loop_handle
         )?;
         info!("✅ Application stopped cleanly");
 
@@ -110,5 +116,15 @@ impl App {
             .expect("An error occurred applying migrations");
 
         pool
+    }
+
+    async fn setup_mediator(&self) -> Arc<Mediator> {
+        let mediator = Arc::new(Mediator::new());
+        mediator
+            .register_query::<HelloQuery, GetHelloResult, GetHelloUseCase>(
+                GetHelloUseCase::new(HelloRepository {}),
+            )
+            .await;
+        mediator
     }
 }

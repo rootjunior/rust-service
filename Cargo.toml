@@ -24,3 +24,5 @@ reqwest = { version = "0.13.1", features = ["blocking", "json"] }
 diesel = "~2.3"
 diesel-async = { version = "0.7", features = ["postgres", "bb8", "migrations"] }
 diesel_migrations = "~2.3"
+async-trait = "0.1.89"
+thiserror = "2.0.18"

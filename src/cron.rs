@@ -7,7 +7,7 @@ use tracing::{error, info};
 pub struct ProjectCron;
 
 impl ProjectCron {
-    pub async fn setup(
+    pub async fn start(
         shutdown: CancellationToken,
     ) -> Result<(), JobSchedulerError> {
         let mut scheduler = JobScheduler::new().await?;

@@ -1,12 +1,12 @@
-use crate::app::Pool;
 use crate::configs::Config;
+use crate::mediator::mediator::Mediator;
 use axum::extract::FromRef;
 use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct AppState {
     pub cfg: Config,
-    pub db_pool: Pool,
+    pub mediator: Arc<Mediator>,
 }
 impl FromRef<Arc<AppState>> for AppState {
     fn from_ref(state: &Arc<AppState>) -> Self {
@@ -14,7 +14,7 @@ impl FromRef<Arc<AppState>> for AppState {
     }
 }
 impl AppState {
-    pub async fn setup(cfg: Config, db_pool: Pool) -> Arc<Self> {
-        Arc::new(AppState { cfg, db_pool })
+    pub async fn setup(cfg: Config, mediator: Arc<Mediator>) -> Arc<Self> {
+        Arc::new(AppState { cfg, mediator })
     }
 }

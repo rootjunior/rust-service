@@ -1,4 +1,8 @@
 use crate::core::models::{AuthenticatedUser, UserResponse};
+use crate::core::results::hello::GetHelloResult;
+use crate::core::use_cases::hello::HelloQuery;
+use crate::state::AppState;
+use axum::extract::State;
 
 #[utoipa::path(
     get,
@@ -24,6 +28,12 @@ pub async fn me(user: AuthenticatedUser) -> UserResponse {
         (status = 200, description = "Приветственное сообщение")
     )
 )]
-pub async fn hello() -> &'static str {
-    "Welcome to API Server! Use /me to get user info."
+pub async fn hello(State(state): State<AppState>) -> String {
+    let mediator = &state.mediator;
+    let result = mediator
+        .query::<HelloQuery, GetHelloResult>(HelloQuery {
+            name: "My name".to_string(),
+        })
+        .await;
+    result.unwrap().name
 }
