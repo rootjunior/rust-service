@@ -12,6 +12,7 @@ pub struct Config {
     _log_level: String,
     pub log_file_name_prefix: String,
     pub log_dir_path: String,
+    pub db_url: String,
 }
 
 impl Config {
@@ -33,7 +34,7 @@ impl Config {
             .expect("LOG_FILE_NAME_PREFIX must be set");
         let log_dir_path =
             var("LOG_DIR_PATH").expect("LOG_DIR_PATH must be set");
-
+        let db_url = var("DATABASE_URL").expect("DATABASE_URL must be set");
         Self {
             secret_token,
             server_address,
@@ -41,6 +42,7 @@ impl Config {
             _workers_count,
             log_file_name_prefix,
             log_dir_path,
+            db_url,
         }
     }
     pub fn log_level(&self) -> LevelFilter {

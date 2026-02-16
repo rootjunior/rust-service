@@ -21,3 +21,6 @@ axum-extra = "0.12.5"
 tokio-cron-scheduler = { version = "0.15.1", features = ["signal", "english"] }
 anyhow = "1.0.100"
 reqwest = { version = "0.13.1", features = ["blocking", "json"] }
+diesel = "~2.3"
+diesel-async = { version = "0.7", features = ["postgres", "bb8", "migrations"] }
+diesel_migrations = "~2.3"
