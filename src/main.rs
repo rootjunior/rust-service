@@ -15,7 +15,6 @@ use crate::logger::Tracing;
 use tokio::runtime::{Builder, Handle};
 use tracing::info;
 
-// #[tokio::main(flavor = "multi_thread", worker_threads = 1)]
 fn main() {
     let cfg = Config::load();
     let app = App::new(cfg.clone());

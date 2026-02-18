@@ -14,14 +14,6 @@ pub struct HelloQuery {
 #[async_trait]
 impl Query for HelloQuery {}
 
-#[derive(Debug, Clone, ToSchema, Deserialize, Serialize)]
-pub struct ByQuery {
-    pub name: String,
-}
-
-#[async_trait]
-impl Query for ByQuery {}
-
 #[async_trait]
 pub trait Command: Send + Sync {}
 

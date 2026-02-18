@@ -7,11 +7,7 @@ use crate::core::results::hello::GetHelloResult;
 use crate::cron::ProjectCron;
 use crate::mediator::mediator::Mediator;
 use crate::state::AppState;
-use diesel_async::pooled_connection::{AsyncDieselConnectionManager, bb8};
-use diesel_async::{AsyncMigrationHarness, AsyncPgConnection};
-use diesel_migrations::{
-    EmbeddedMigrations, MigrationHarness, embed_migrations,
-};
+use sea_orm::{Database, DatabaseConnection};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
@@ -19,9 +15,6 @@ use tokio::task::spawn_blocking;
 use tokio::{signal, spawn};
 use tokio_util::sync::CancellationToken;
 use tracing::{error, info};
-
-pub type Pool = bb8::Pool<AsyncPgConnection>;
-pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 pub struct App {
     pub cfg: Config,
@@ -33,7 +26,9 @@ impl App {
     }
 
     pub async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {
-        // let pool = self.setup_db_pool().await;
+        let db: DatabaseConnection =
+            Database::connect(&self.cfg.db_url).await?;
+
         let mediator = self.setup_mediator().await;
         let state = AppState::setup(self.cfg.clone(), mediator).await;
 
@@ -97,25 +92,6 @@ impl App {
         info!("✅ Application stopped cleanly");
 
         Ok(())
-    }
-    async fn setup_db_pool(&self) -> Pool {
-        let pool: Pool = bb8::Pool::builder()
-            .build(AsyncDieselConnectionManager::<AsyncPgConnection>::new(
-                &self.cfg.db_url,
-            ))
-            .await
-            .expect("Failed to create database connection pool");
-
-        //  Применение  миграций
-        let mut harness =
-            AsyncMigrationHarness::new(pool.get_owned().await.expect(
-                "Occurred due to an error establishing a connection to the database"
-            ));
-        harness
-            .run_pending_migrations(MIGRATIONS)
-            .expect("An error occurred applying migrations");
-
-        pool
     }
 
     async fn setup_mediator(&self) -> Arc<Mediator> {
