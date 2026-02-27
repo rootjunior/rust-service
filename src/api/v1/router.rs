@@ -4,6 +4,6 @@ use axum::Router;
 use axum::routing::get;
 use std::sync::Arc;
 
-pub fn router() -> Router<Arc<AppState>> {
+pub fn router() -> Router<AppState> {
     Router::new().route("/hello", get(hello)).route("/me", get(me))
 }

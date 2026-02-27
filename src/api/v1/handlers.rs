@@ -1,8 +1,10 @@
 use crate::core::handlers::hello::HelloQuery;
 use crate::core::models::{AuthenticatedUser, UserResponse};
 use crate::core::results::hello::GetHelloResult;
+use crate::mediator::mediator::Mediator;
 use crate::state::AppState;
 use axum::extract::State;
+use std::sync::Arc;
 
 #[utoipa::path(
     get,
@@ -28,10 +30,9 @@ pub async fn me(user: AuthenticatedUser) -> UserResponse {
         (status = 200, description = "Приветственное сообщение")
     )
 )]
-pub async fn hello(State(state): State<AppState>) -> String {
+pub async fn hello(State(mediator): State<Arc<Mediator>>) -> String {
     // Обрабатывать ошибки
-    state
-        .mediator
+    mediator
         .query::<HelloQuery, GetHelloResult>(HelloQuery {
             name: "My name".to_string(),
         })

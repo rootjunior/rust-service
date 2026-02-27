@@ -36,7 +36,7 @@ impl App {
     }
     async fn run_and_wait_tasks(
         &self,
-        state: Arc<AppState>,
+        state: AppState,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let shutdown = CancellationToken::new();
         let server_shutdown = shutdown.clone();

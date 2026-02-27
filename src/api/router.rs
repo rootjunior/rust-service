@@ -5,6 +5,6 @@ use crate::state::AppState;
 use axum::Router;
 use std::sync::Arc;
 
-pub fn router() -> Router<Arc<AppState>> {
+pub fn router() -> Router<AppState> {
     Router::new().nest("/api/v1", v1_router()).nest("/api/v2", v2_router())
 }

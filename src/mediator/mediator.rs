@@ -2,13 +2,14 @@ use crate::core::handlers::hello::{
     Command, CommandHandler, Query, QueryHandler,
 };
 use crate::mediator::errors::MediatorError;
+use crate::state::AppState;
+use axum::extract::FromRef;
 use futures_util::future::BoxFuture;
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::error;
-
 // Типы замыканий
 
 type CommandFn = Arc<
@@ -32,6 +33,11 @@ pub struct Mediator {
     queries: Mutex<HashMap<TypeId, QueryFn>>,
 }
 
+impl FromRef<AppState> for Arc<Mediator> {
+    fn from_ref(state: &AppState) -> Self {
+        state.mediator.clone()
+    }
+}
 impl Mediator {
     pub fn new() -> Self {
         Self {

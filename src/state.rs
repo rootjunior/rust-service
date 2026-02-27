@@ -14,7 +14,7 @@ impl FromRef<Arc<AppState>> for AppState {
     }
 }
 impl AppState {
-    pub async fn setup(cfg: Config, mediator: Arc<Mediator>) -> Arc<Self> {
-        Arc::new(AppState { cfg, mediator })
+    pub async fn setup(cfg: Config, mediator: Arc<Mediator>) -> Self {
+        AppState { cfg, mediator }
     }
 }

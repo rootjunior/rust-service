@@ -18,7 +18,7 @@ pub struct ProjectHTTPServer;
 impl ProjectHTTPServer {
     pub async fn run(
         shutdown: CancellationToken,
-        state: &Arc<AppState>,
+        state: &AppState,
     ) -> std::io::Result<()> {
         let app = router()
             .route("/ws", get(ws_handler))
